@@ -17,15 +17,18 @@
         private readonly UserManager<ApplicationUser> userManager;
         private readonly SignInManager<ApplicationUser> signInManager;
         private readonly IOptions<ApplicationSettings> appSettings;
+        private readonly ILogger<IdentityController> logger;
 
         public IdentityController(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
-            IOptions<ApplicationSettings> appSettings)
+            IOptions<ApplicationSettings> appSettings,
+            ILogger<IdentityController> logger)
         {
             this.userManager = userManager;
             this.signInManager = signInManager;
             this.appSettings = appSettings;
+            this.logger = logger;
         }
 
         [HttpPost]
@@ -50,7 +53,7 @@
                 return Ok(new AuthenticationViewModel
                 {
                     Message = "You have successfully logged in.",
-                    Token = GenerateJwtToken(user),
+                    Token = await GenerateJwtToken(user),
                 });
             }
 
@@ -90,7 +93,7 @@
             var result = await this.userManager.CreateAsync(user, input.Password);
             if (result.Succeeded)
             {
-                var addToRoleResult = await userManager.AddToRoleAsync(user, "User");
+                var addToRoleResult = await userManager.AddToRoleAsync(user, Constants.UserRoleName);
                 if (addToRoleResult.Succeeded)
                 {
                     return Ok(Login(new LoginInputModel
@@ -107,22 +110,21 @@
             });
         }
 
-        private string GenerateJwtToken(ApplicationUser user)
+        private async Task<string> GenerateJwtToken(ApplicationUser user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var secret = appSettings.Value.Secret;
             var key = Encoding.ASCII.GetBytes(secret);
 
+            var roles = await this.userManager.GetRolesAsync(user);
+
             var tokenDescriptor = new SecurityTokenDescriptor
             {
-                Subject = new ClaimsIdentity(new Claim[]
+                Subject = new ClaimsIdentity(new List<Claim>
                     {
                         new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                         new Claim(ClaimTypes.Name, user.UserName),
-                        new Claim(ClaimTypes.Role,
-                            this.userManager.IsInRoleAsync(user, Constants.AdministratorRoleName)
-                                .GetAwaiter()
-                                .GetResult() ? Constants.AdministratorRoleName : Constants.UserRoleName)
+                        new Claim(ClaimTypes.Role, roles.FirstOrDefault())
                     }),
                 Expires = DateTime.UtcNow.AddDays(7),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)

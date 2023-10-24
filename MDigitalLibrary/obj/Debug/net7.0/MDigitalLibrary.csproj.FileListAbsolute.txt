@@ -1,0 +1,14 @@
+C:\Users\User\Documents\GitHub\MDigital-Library\MDigitalLibrary\bin\Debug\net7.0\MDigitalLibrary.deps.json
+C:\Users\User\Documents\GitHub\MDigital-Library\MDigitalLibrary\bin\Debug\net7.0\MDigitalLibrary.runtimeconfig.json
+C:\Users\User\Documents\GitHub\MDigital-Library\MDigitalLibrary\bin\Debug\net7.0\MDigitalLibrary.dll
+C:\Users\User\Documents\GitHub\MDigital-Library\MDigitalLibrary\bin\Debug\net7.0\MDigitalLibrary.pdb
+C:\Users\User\Documents\GitHub\MDigital-Library\MDigitalLibrary\obj\Debug\net7.0\MDigitalLibrary.csproj.AssemblyReference.cache
+C:\Users\User\Documents\GitHub\MDigital-Library\MDigitalLibrary\obj\Debug\net7.0\MDigitalLibrary.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\User\Documents\GitHub\MDigital-Library\MDigitalLibrary\obj\Debug\net7.0\MDigitalLibrary.AssemblyInfoInputs.cache
+C:\Users\User\Documents\GitHub\MDigital-Library\MDigitalLibrary\obj\Debug\net7.0\MDigitalLibrary.AssemblyInfo.cs
+C:\Users\User\Documents\GitHub\MDigital-Library\MDigitalLibrary\obj\Debug\net7.0\MDigitalLibrary.csproj.CoreCompileInputs.cache
+C:\Users\User\Documents\GitHub\MDigital-Library\MDigitalLibrary\obj\Debug\net7.0\MDigitalLibrary.dll
+C:\Users\User\Documents\GitHub\MDigital-Library\MDigitalLibrary\obj\Debug\net7.0\refint\MDigitalLibrary.dll
+C:\Users\User\Documents\GitHub\MDigital-Library\MDigitalLibrary\obj\Debug\net7.0\MDigitalLibrary.pdb
+C:\Users\User\Documents\GitHub\MDigital-Library\MDigitalLibrary\obj\Debug\net7.0\MDigitalLibrary.genruntimeconfig.cache
+C:\Users\User\Documents\GitHub\MDigital-Library\MDigitalLibrary\obj\Debug\net7.0\ref\MDigitalLibrary.dll
