@@ -3,6 +3,7 @@
     using MDigitalLibrary.Controllers;
     using MDigitalLibrary.Identity.Data.Models;
     using MDigitalLibrary.Identity.Models;
+    using MDigitalLibrary.Services.Identity;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Identity;
     using Microsoft.AspNetCore.Mvc;
@@ -18,17 +19,20 @@
         private readonly SignInManager<ApplicationUser> signInManager;
         private readonly IOptions<ApplicationSettings> appSettings;
         private readonly ILogger<IdentityController> logger;
+        private readonly ICurrentUserService currentUserService;
 
         public IdentityController(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             IOptions<ApplicationSettings> appSettings,
-            ILogger<IdentityController> logger)
+            ILogger<IdentityController> logger,
+            ICurrentUserService currentUserService)
         {
             this.userManager = userManager;
             this.signInManager = signInManager;
             this.appSettings = appSettings;
             this.logger = logger;
+            this.currentUserService = currentUserService;
         }
 
         [HttpPost]
@@ -110,6 +114,35 @@
             });
         }
 
+        [HttpPost]
+        [Route(nameof(ChangePassword))]
+        public async Task<IActionResult> ChangePassword(ChangePasswordInputModel input)
+        {
+            var user = this.userManager.Users.FirstOrDefault(x => x.Id == this.currentUserService.UserId);
+
+            this.logger.LogInformation("Hello, id {Name}", user.UserName);
+
+            await Console.Out.WriteLineAsync(   "heeleodr");
+
+            if (user == null) {
+                this.logger.LogError("Something went wrong changing password for user with id '{UserId}'", this.currentUserService.UserId);
+
+                return BadRequest();
+            }
+
+            var validPassword = await this.userManager.CheckPasswordAsync(user, input.CurrentPassword);
+
+            if (!validPassword)
+            {
+                this.logger.LogInformation("User with id {UserId} has enteres a wrong password", this.currentUserService.UserId);
+                return BadRequest();
+            }
+
+            await this.userManager.ChangePasswordAsync(user, input.CurrentPassword, input.NewPassword);
+
+            return Ok();
+        }
+
         private async Task<string> GenerateJwtToken(ApplicationUser user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -123,8 +156,9 @@
                 Subject = new ClaimsIdentity(new List<Claim>
                     {
                         new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                        new Claim(ClaimTypes.NameIdentifier, user.Id),
                         new Claim(ClaimTypes.Name, user.UserName),
-                        new Claim(ClaimTypes.Role, roles.FirstOrDefault())
+                        new Claim(ClaimTypes.Role, roles.FirstOrDefault())//for now we support a single role per user in the table UserRoles
                     }),
                 Expires = DateTime.UtcNow.AddDays(7),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
