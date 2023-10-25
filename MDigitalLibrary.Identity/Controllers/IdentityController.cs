@@ -143,6 +143,49 @@
             return Ok();
         }
 
+        [HttpPost]
+        [Authorize(Roles = Constants.AdministratorRoleName)]
+        [Route(nameof(RegisterModerator))]
+        public async Task<IActionResult> RegisterModerator(RegisterInputModel input)
+        {
+            if (this.userManager.Users.Any(x => x.Email == input.Email))
+            {
+                return BadRequest(new BadRequestViewModel
+                {
+                    Message = "This e-mail is already in use. Please try with another one."
+                });
+            }
+
+            if (this.userManager.Users.Any(x => x.UserName == input.UserName))
+            {
+                return BadRequest(new BadRequestViewModel
+                {
+                    Message = "This username is already in use. Please try with another one."
+                });
+            }
+
+            var user = new ApplicationUser
+            {
+                UserName = input.UserName,
+                Email = input.Email,
+            };
+
+            var result = await this.userManager.CreateAsync(user, input.Password);
+            if (result.Succeeded)
+            {
+                var addToRoleResult = await userManager.AddToRoleAsync(user, Constants.ModeratorRoleName);
+                if (addToRoleResult.Succeeded)
+                {
+                    return Ok();
+                }
+            }
+
+            return BadRequest(new BadRequestViewModel
+            {
+                Message = "Something went wrong."
+            });
+        }
+
         private async Task<string> GenerateJwtToken(ApplicationUser user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
